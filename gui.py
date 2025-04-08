@@ -37,19 +37,29 @@ class SmartBudgetGUI:
         self.create_widgets()
 
     def create_widgets(self):
-        input_frame = ttk.Frame(self.root, padding="20 10 20 10")
-        input_frame.pack(fill=tk.X)
+        # App Title
+        title_label = ttk.Label(self.root, text="SmartBudget 💰", font=("Segoe UI", 16, "bold"), anchor="center")
+        title_label.pack(pady=(20, 10))
 
-        ttk.Label(input_frame, text="💵 Amount:").grid(row=0, column=0, sticky=tk.W, pady=8)
-        self.amount_entry = ttk.Entry(input_frame)
-        self.amount_entry.grid(row=0, column=1, pady=8)
+        # Input Section Frame (centered)
+        input_frame = ttk.Frame(self.root)
+        input_frame.pack(pady=10)
 
-        ttk.Label(input_frame, text="📂 Category:").grid(row=1, column=0, sticky=tk.W, pady=8)
-        self.category_entry = ttk.Entry(input_frame)
-        self.category_entry.grid(row=1, column=1, pady=8)
+        # Amount Input
+        amount_label = ttk.Label(input_frame, text="💵 Amount:")
+        amount_label.grid(row=0, column=0, sticky="e", padx=5, pady=10)
+        self.amount_entry = ttk.Entry(input_frame, justify="center", width=25)
+        self.amount_entry.grid(row=0, column=1, pady=10)
 
-        button_frame = ttk.Frame(self.root, padding="20")
-        button_frame.pack(fill=tk.BOTH, expand=True)
+        # Category Input
+        category_label = ttk.Label(input_frame, text="📂 Category:")
+        category_label.grid(row=1, column=0, sticky="e", padx=5, pady=10)
+        self.category_entry = ttk.Entry(input_frame, justify="center", width=25)
+        self.category_entry.grid(row=1, column=1, pady=10)
+
+        # Buttons Section Frame (centered)
+        button_frame = ttk.Frame(self.root)
+        button_frame.pack(pady=10)
 
         buttons = [
             ("➕ Add Income", self.add_income),
@@ -65,7 +75,8 @@ class SmartBudgetGUI:
         for i, (text, command) in enumerate(buttons):
             style_name = f"Colored{i}.TButton"
             btn = ttk.Button(button_frame, text=text, command=command, style=style_name)
-            btn.grid(row=i, column=0, pady=6, padx=10, sticky="ew")
+            btn.pack(pady=6, ipadx=10, fill="x", expand=True)
+
 
     def add_income(self):
         try:
@@ -134,29 +145,39 @@ class SmartBudgetGUI:
 
         summary_window = tk.Toplevel(self.root)
         summary_window.title("📊 Summary Overview")
-        summary_window.geometry("350x200")
+        summary_window.geometry("400x250")
         summary_window.configure(bg="#f7f7f7")
 
-        frame = ttk.Frame(summary_window, padding="20 10 20 10")
-        frame.pack(fill="both", expand=True)
+        # Create a centered outer frame
+        outer_frame = ttk.Frame(summary_window, padding="20 20 20 20")
+        outer_frame.pack(expand=True)
 
-        # Labels with icons
-        ttk.Label(frame, text="💰 Total Income:", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="w", pady=10)
-        ttk.Label(frame, text=f"${summary['total_income']:.2f}", font=("Segoe UI", 12)).grid(row=0, column=1, sticky="e")
+        # Create a LabelFrame for styling
+        card = ttk.LabelFrame(outer_frame, text="💼 Financial Summary", padding="20 15 20 15")
+        card.grid(row=0, column=0, sticky="nsew")
 
-        ttk.Label(frame, text="💸 Total Expense:", font=("Segoe UI", 12, "bold")).grid(row=1, column=0, sticky="w", pady=10)
-        ttk.Label(frame, text=f"${summary['total_expense']:.2f}", font=("Segoe UI", 12)).grid(row=1, column=1, sticky="e")
+        # Configure grid weights to center content
+        for i in range(3):
+            card.grid_rowconfigure(i, weight=1)
+        card.grid_columnconfigure(0, weight=1)
+        card.grid_columnconfigure(1, weight=1)
+
+        # Create styled rows
+        ttk.Label(card, text="💰 Total Income:", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="e", pady=8, padx=5)
+        ttk.Label(card, text=f"${summary['total_income']:.2f}", font=("Segoe UI", 12)).grid(row=0, column=1, sticky="w", pady=8, padx=5)
+
+        ttk.Label(card, text="💸 Total Expense:", font=("Segoe UI", 12, "bold")).grid(row=1, column=0, sticky="e", pady=8, padx=5)
+        ttk.Label(card, text=f"${summary['total_expense']:.2f}", font=("Segoe UI", 12)).grid(row=1, column=1, sticky="w", pady=8, padx=5)
 
         net = summary['net_savings']
         net_color = "#4caf50" if net >= 0 else "#f44336"
-        net_label = ttk.Label(frame, text="💼 Net Savings:", font=("Segoe UI", 12, "bold"))
-        net_label.grid(row=2, column=0, sticky="w", pady=10)
 
-        net_value = ttk.Label(frame, text=f"${net:.2f}", font=("Segoe UI", 12))
-        net_value.grid(row=2, column=1, sticky="e")
+        ttk.Label(card, text="📦 Net Savings:", font=("Segoe UI", 12, "bold")).grid(row=2, column=0, sticky="e", pady=8, padx=5)
 
-        # Manually apply color using regular tk.Label for colored value
-        net_value.configure(foreground=net_color)
+        # Use tk.Label here to add color
+        net_label = tk.Label(card, text=f"${net:.2f}", font=("Segoe UI", 12, "bold"), fg=net_color, bg=card.cget("background"))
+        net_label.grid(row=2, column=1, sticky="w", pady=8, padx=5)
+
 
 
     def show_expense_pie(self):
